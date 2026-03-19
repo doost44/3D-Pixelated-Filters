@@ -12,6 +12,7 @@ import {
   applyScanlines,
   applyEdgeGlow,
   applyColorPalette,
+  apply3DBlockEffect,
 } from "../../lib/pixelEffects";
 
 export function usePixelRenderer(
@@ -87,6 +88,36 @@ export function usePixelRenderer(
     ctx.restore();
 
     const effect = settings.effect;
+
+    // 3D Block effect doesn't use the source video/image, it renders text/logo
+    if (effect === "3D Block") {
+      ctx.clearRect(0, 0, w, h);
+      if (!settings.transparentBg) {
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      apply3DBlockEffect(ctx, w, h, {
+        text: settings.blockText || 'PIXEL',
+        font: settings.blockFont || 'Arial Black',
+        material: settings.blockMaterial || 'Stone',
+        frontColor: settings.blockFrontColor || '#8b7355',
+        sideColor: settings.blockSideColor || '#5c4a3a',
+        outlineThickness: settings.blockOutlineThickness || 3,
+        extrusionDepth: settings.blockExtrusionDepth || 20,
+        extrusionAngle: settings.blockExtrusionAngle || 45,
+        perspective: settings.blockPerspective || 15,
+        crackAmount: settings.blockCrackAmount || 30,
+        shadowStrength: settings.blockShadowStrength || 50,
+        lightAngle: settings.blockLightAngle || 135,
+        highlightAmount: settings.blockHighlightAmount || 40,
+        textureScale: settings.blockTextureScale || 100,
+      }, source instanceof HTMLImageElement ? source : undefined);
+
+      rafRef.current = requestAnimationFrame(render);
+      return;
+    }
+
     if (effect === "Pixel" || effect === "Dither") {
       applyPixelate(ctx, w, h, settings.pixelSize);
     }

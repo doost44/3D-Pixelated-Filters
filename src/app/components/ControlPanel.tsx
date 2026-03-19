@@ -1,6 +1,6 @@
 'use client';
 import type { StyleSettings, PresetName } from '../lib/stylePresets';
-import { STYLE_PRESETS, PALETTE_NAMES, EFFECT_NAMES } from '../lib/stylePresets';
+import { STYLE_PRESETS, PALETTE_NAMES, EFFECT_NAMES, BLOCK_FONTS, BLOCK_MATERIALS } from '../lib/stylePresets';
 
 interface ControlPanelProps {
   settings: StyleSettings;
@@ -58,6 +58,8 @@ export default function ControlPanel({
     onChange(STYLE_PRESETS[preset]);
   };
 
+  const is3DBlockMode = settings.effect === '3D Block';
+
   return (
     <div
       className="absolute bottom-24 left-4 z-20 w-72 panel-bg rounded p-3 overflow-y-auto"
@@ -71,38 +73,42 @@ export default function ControlPanel({
         ◈ CONTROL PANEL
       </div>
 
-      <div className="mb-3">
-        <div className="text-xs mb-1" style={{ color: '#666' }}>PRESET</div>
-        <div className="flex gap-1">
-          {PRESETS.map((p) => (
-            <button
-              key={p}
-              onClick={() => applyPreset(p)}
-              className="flex-1 py-1 text-xs transition-colors"
-              style={{
-                border: '1px solid #00ff8844',
-                color: '#00ff88',
-                background: 'transparent',
-                fontSize: '10px',
-              }}
-            >
-              {p}
-            </button>
-          ))}
+      {!is3DBlockMode && (
+        <div className="mb-3">
+          <div className="text-xs mb-1" style={{ color: '#666' }}>PRESET</div>
+          <div className="flex gap-1">
+            {PRESETS.map((p) => (
+              <button
+                key={p}
+                onClick={() => applyPreset(p)}
+                className="flex-1 py-1 text-xs transition-colors"
+                style={{
+                  border: '1px solid #00ff8844',
+                  color: '#00ff88',
+                  background: 'transparent',
+                  fontSize: '10px',
+                }}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="mb-2">
-        <div className="text-xs mb-1" style={{ color: '#666' }}>PALETTE</div>
-        <select
-          value={settings.palette}
-          onChange={(e) => onChange({ palette: e.target.value })}
-          className="w-full text-xs p-1"
-          style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
-        >
-          {PALETTE_NAMES.map((p) => <option key={p} value={p}>{p}</option>)}
-        </select>
-      </div>
+      {!is3DBlockMode && (
+        <div className="mb-2">
+          <div className="text-xs mb-1" style={{ color: '#666' }}>PALETTE</div>
+          <select
+            value={settings.palette}
+            onChange={(e) => onChange({ palette: e.target.value })}
+            className="w-full text-xs p-1"
+            style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
+          >
+            {PALETTE_NAMES.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </div>
+      )}
 
       <div className="mb-3">
         <div className="text-xs mb-1" style={{ color: '#666' }}>EFFECT</div>
@@ -116,22 +122,159 @@ export default function ControlPanel({
         </select>
       </div>
 
-      <Slider label="Pixel Size" value={settings.pixelSize} min={1} max={32} onChange={(v) => onChange({ pixelSize: v })} />
-      <Slider label="Blur" value={settings.blur} min={0} max={10} onChange={(v) => onChange({ blur: v })} />
-      <Slider label="Contrast" value={settings.contrast} min={0} max={200} unit="%" onChange={(v) => onChange({ contrast: v })} />
-      <Slider label="Brightness" value={settings.brightness} min={0} max={200} unit="%" onChange={(v) => onChange({ brightness: v })} />
-      <Slider label="Saturation" value={settings.saturation} min={0} max={200} unit="%" onChange={(v) => onChange({ saturation: v })} />
-      <Slider label="Dithering" value={settings.ditheringAmount} min={0} max={100} unit="%" onChange={(v) => onChange({ ditheringAmount: v })} />
-      <Slider label="Frame Skip" value={settings.frameSkip} min={0} max={10} onChange={(v) => onChange({ frameSkip: v })} />
-      <Slider label="Rotation Spd" value={settings.rotationSpeed} min={0} max={10} onChange={(v) => onChange({ rotationSpeed: v })} />
-      <Slider label="Depth Scale" value={settings.depthScale} min={0} max={200} unit="%" onChange={(v) => onChange({ depthScale: v })} />
+      {is3DBlockMode ? (
+        <>
+          {/* 3D Block specific controls */}
+          <div className="mb-2">
+            <div className="text-xs mb-1" style={{ color: '#666' }}>TEXT</div>
+            <input
+              type="text"
+              value={settings.blockText || 'PIXEL'}
+              onChange={(e) => onChange({ blockText: e.target.value })}
+              className="w-full text-xs p-1"
+              style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
+              placeholder="Enter text..."
+            />
+          </div>
 
-      <div className="mt-3 mb-3 border-t pt-2" style={{ borderColor: '#00ff8822' }}>
-        <Toggle label="Scanlines" value={settings.scanlines} onChange={(v) => onChange({ scanlines: v })} />
-        <Toggle label="Edge Glow" value={settings.edgeGlow} onChange={(v) => onChange({ edgeGlow: v })} />
-        <Toggle label="Transparent BG" value={settings.transparentBg} onChange={(v) => onChange({ transparentBg: v })} />
-        <Toggle label="Loop Blend" value={settings.loopBlend} onChange={(v) => onChange({ loopBlend: v })} />
-      </div>
+          <div className="mb-2">
+            <div className="text-xs mb-1" style={{ color: '#666' }}>FONT</div>
+            <select
+              value={settings.blockFont || 'Arial Black'}
+              onChange={(e) => onChange({ blockFont: e.target.value })}
+              className="w-full text-xs p-1"
+              style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
+            >
+              {BLOCK_FONTS.map((f) => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+
+          <div className="mb-2">
+            <div className="text-xs mb-1" style={{ color: '#666' }}>MATERIAL</div>
+            <select
+              value={settings.blockMaterial || 'Stone'}
+              onChange={(e) => onChange({ blockMaterial: e.target.value })}
+              className="w-full text-xs p-1"
+              style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
+            >
+              {BLOCK_MATERIALS.map((m) => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </div>
+
+          <div className="mb-2">
+            <div className="text-xs mb-1" style={{ color: '#666' }}>FRONT COLOR</div>
+            <input
+              type="color"
+              value={settings.blockFrontColor || '#8b7355'}
+              onChange={(e) => onChange({ blockFrontColor: e.target.value })}
+              className="w-full h-8 cursor-pointer"
+              style={{ background: '#111', border: '1px solid #00ff8844' }}
+            />
+          </div>
+
+          <div className="mb-2">
+            <div className="text-xs mb-1" style={{ color: '#666' }}>SIDE COLOR</div>
+            <input
+              type="color"
+              value={settings.blockSideColor || '#5c4a3a'}
+              onChange={(e) => onChange({ blockSideColor: e.target.value })}
+              className="w-full h-8 cursor-pointer"
+              style={{ background: '#111', border: '1px solid #00ff8844' }}
+            />
+          </div>
+
+          <Slider
+            label="Outline"
+            value={settings.blockOutlineThickness || 3}
+            min={0}
+            max={10}
+            onChange={(v) => onChange({ blockOutlineThickness: v })}
+          />
+          <Slider
+            label="Extrusion Depth"
+            value={settings.blockExtrusionDepth || 20}
+            min={5}
+            max={50}
+            onChange={(v) => onChange({ blockExtrusionDepth: v })}
+          />
+          <Slider
+            label="Extrusion Angle"
+            value={settings.blockExtrusionAngle || 45}
+            min={0}
+            max={360}
+            unit="°"
+            onChange={(v) => onChange({ blockExtrusionAngle: v })}
+          />
+          <Slider
+            label="Perspective"
+            value={settings.blockPerspective || 15}
+            min={0}
+            max={50}
+            onChange={(v) => onChange({ blockPerspective: v })}
+          />
+          <Slider
+            label="Crack Detail"
+            value={settings.blockCrackAmount || 30}
+            min={0}
+            max={100}
+            onChange={(v) => onChange({ blockCrackAmount: v })}
+          />
+          <Slider
+            label="Shadow"
+            value={settings.blockShadowStrength || 50}
+            min={0}
+            max={100}
+            onChange={(v) => onChange({ blockShadowStrength: v })}
+          />
+          <Slider
+            label="Light Angle"
+            value={settings.blockLightAngle || 135}
+            min={0}
+            max={360}
+            unit="°"
+            onChange={(v) => onChange({ blockLightAngle: v })}
+          />
+          <Slider
+            label="Highlight"
+            value={settings.blockHighlightAmount || 40}
+            min={0}
+            max={100}
+            onChange={(v) => onChange({ blockHighlightAmount: v })}
+          />
+          <Slider
+            label="Texture Scale"
+            value={settings.blockTextureScale || 100}
+            min={50}
+            max={200}
+            unit="%"
+            onChange={(v) => onChange({ blockTextureScale: v })}
+          />
+
+          <div className="mt-3 mb-3 border-t pt-2" style={{ borderColor: '#00ff8822' }}>
+            <Toggle label="Transparent BG" value={settings.transparentBg} onChange={(v) => onChange({ transparentBg: v })} />
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Standard pixel effect controls */}
+          <Slider label="Pixel Size" value={settings.pixelSize} min={1} max={32} onChange={(v) => onChange({ pixelSize: v })} />
+          <Slider label="Blur" value={settings.blur} min={0} max={10} onChange={(v) => onChange({ blur: v })} />
+          <Slider label="Contrast" value={settings.contrast} min={0} max={200} unit="%" onChange={(v) => onChange({ contrast: v })} />
+          <Slider label="Brightness" value={settings.brightness} min={0} max={200} unit="%" onChange={(v) => onChange({ brightness: v })} />
+          <Slider label="Saturation" value={settings.saturation} min={0} max={200} unit="%" onChange={(v) => onChange({ saturation: v })} />
+          <Slider label="Dithering" value={settings.ditheringAmount} min={0} max={100} unit="%" onChange={(v) => onChange({ ditheringAmount: v })} />
+          <Slider label="Frame Skip" value={settings.frameSkip} min={0} max={10} onChange={(v) => onChange({ frameSkip: v })} />
+          <Slider label="Rotation Spd" value={settings.rotationSpeed} min={0} max={10} onChange={(v) => onChange({ rotationSpeed: v })} />
+          <Slider label="Depth Scale" value={settings.depthScale} min={0} max={200} unit="%" onChange={(v) => onChange({ depthScale: v })} />
+
+          <div className="mt-3 mb-3 border-t pt-2" style={{ borderColor: '#00ff8822' }}>
+            <Toggle label="Scanlines" value={settings.scanlines} onChange={(v) => onChange({ scanlines: v })} />
+            <Toggle label="Edge Glow" value={settings.edgeGlow} onChange={(v) => onChange({ edgeGlow: v })} />
+            <Toggle label="Transparent BG" value={settings.transparentBg} onChange={(v) => onChange({ transparentBg: v })} />
+            <Toggle label="Loop Blend" value={settings.loopBlend} onChange={(v) => onChange({ loopBlend: v })} />
+          </div>
+        </>
+      )}
 
       <div className="flex gap-1 flex-wrap">
         <button

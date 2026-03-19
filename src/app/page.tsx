@@ -60,22 +60,43 @@ export default function Home() {
   );
 
   const handleRandomize = useCallback(() => {
-    setSettings((prev) => ({
-      ...prev,
-      pixelSize: Math.floor(Math.random() * 16) + 1,
-      blur: Math.floor(Math.random() * 5),
-      contrast: Math.floor(Math.random() * 100) + 80,
-      brightness: Math.floor(Math.random() * 80) + 80,
-      saturation: Math.floor(Math.random() * 150) + 50,
-      ditheringAmount: Math.floor(Math.random() * 80),
-      frameSkip: Math.floor(Math.random() * 4),
-      rotationSpeed: Math.floor(Math.random() * 5),
-      depthScale: Math.floor(Math.random() * 100) + 80,
-      scanlines: Math.random() > 0.5,
-      edgeGlow: Math.random() > 0.5,
-      palette: PALETTE_NAMES[Math.floor(Math.random() * PALETTE_NAMES.length)],
-      effect: EFFECT_NAMES[Math.floor(Math.random() * EFFECT_NAMES.length)],
-    }));
+    setSettings((prev) => {
+      const newEffect = EFFECT_NAMES[Math.floor(Math.random() * EFFECT_NAMES.length)];
+      const is3DBlock = newEffect === '3D Block';
+
+      if (is3DBlock) {
+        return {
+          ...prev,
+          effect: newEffect,
+          blockExtrusionDepth: Math.floor(Math.random() * 30) + 10,
+          blockExtrusionAngle: Math.floor(Math.random() * 360),
+          blockPerspective: Math.floor(Math.random() * 40) + 5,
+          blockCrackAmount: Math.floor(Math.random() * 100),
+          blockShadowStrength: Math.floor(Math.random() * 80) + 20,
+          blockLightAngle: Math.floor(Math.random() * 360),
+          blockHighlightAmount: Math.floor(Math.random() * 80) + 10,
+          blockTextureScale: Math.floor(Math.random() * 100) + 50,
+          blockOutlineThickness: Math.floor(Math.random() * 8) + 1,
+        };
+      } else {
+        return {
+          ...prev,
+          pixelSize: Math.floor(Math.random() * 16) + 1,
+          blur: Math.floor(Math.random() * 5),
+          contrast: Math.floor(Math.random() * 100) + 80,
+          brightness: Math.floor(Math.random() * 80) + 80,
+          saturation: Math.floor(Math.random() * 150) + 50,
+          ditheringAmount: Math.floor(Math.random() * 80),
+          frameSkip: Math.floor(Math.random() * 4),
+          rotationSpeed: Math.floor(Math.random() * 5),
+          depthScale: Math.floor(Math.random() * 100) + 80,
+          scanlines: Math.random() > 0.5,
+          edgeGlow: Math.random() > 0.5,
+          palette: PALETTE_NAMES[Math.floor(Math.random() * PALETTE_NAMES.length)],
+          effect: newEffect,
+        };
+      }
+    });
   }, []);
 
   const handleReset = useCallback(() => {
