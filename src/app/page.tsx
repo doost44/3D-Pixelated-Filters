@@ -8,7 +8,7 @@ import ExportPanel from './components/ExportPanel';
 import { useVideoPlayer } from './components/hooks/useVideoPlayer';
 import { usePixelRenderer } from './components/hooks/usePixelRenderer';
 import { useExport } from './components/hooks/useExport';
-import { DEFAULT_SETTINGS } from './lib/stylePresets';
+import { DEFAULT_SETTINGS, PALETTE_NAMES, EFFECT_NAMES } from './lib/stylePresets';
 import type { StyleSettings } from './lib/stylePresets';
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
 
   const { videoRef, state, loadVideo, togglePlay, seekTo, setLoopIn, setLoopOut } = useVideoPlayer();
 
-  const canvasRef = usePixelRenderer(videoRef, settings, state.isPlaying, settings.loopBlend);
+  const canvasRef = usePixelRenderer(videoRef, settings);
 
   const { exportGIF, exportWebM, exportPNGSequence, isExporting, exportStatus } = useExport(canvasRef);
 
@@ -44,8 +44,8 @@ export default function Home() {
       depthScale: Math.floor(Math.random() * 100) + 80,
       scanlines: Math.random() > 0.5,
       edgeGlow: Math.random() > 0.5,
-      palette: ['RGB', 'Techno', 'GameBoy', 'Neon', 'Vaporwave', 'Monochrome'][Math.floor(Math.random() * 6)],
-      effect: ['Pixel', 'Dither', 'CRT', 'Posterize', 'Mosaic', 'Glitch'][Math.floor(Math.random() * 6)],
+      palette: PALETTE_NAMES[Math.floor(Math.random() * PALETTE_NAMES.length)],
+      effect: EFFECT_NAMES[Math.floor(Math.random() * EFFECT_NAMES.length)],
     }));
   }, []);
 

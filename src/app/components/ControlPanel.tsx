@@ -1,6 +1,6 @@
 'use client';
 import type { StyleSettings, PresetName } from '../lib/stylePresets';
-import { STYLE_PRESETS } from '../lib/stylePresets';
+import { STYLE_PRESETS, PALETTE_NAMES, EFFECT_NAMES } from '../lib/stylePresets';
 
 interface ControlPanelProps {
   settings: StyleSettings;
@@ -13,8 +13,6 @@ interface ControlPanelProps {
 }
 
 const PRESETS: PresetName[] = ['8-bit', '16-bit', '32-bit', '64-bit'];
-const PALETTES = ['RGB', 'Techno', 'GameBoy', 'Neon', 'Vaporwave', 'Monochrome'];
-const EFFECTS = ['Pixel', 'Dither', 'CRT', 'Posterize', 'Mosaic', 'Glitch'];
 
 function Slider({ label, value, min, max, step = 1, unit = '', onChange }: {
   label: string; value: number; min: number; max: number; step?: number; unit?: string;
@@ -102,7 +100,7 @@ export default function ControlPanel({
           className="w-full text-xs p-1"
           style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
         >
-          {PALETTES.map((p) => <option key={p} value={p}>{p}</option>)}
+          {PALETTE_NAMES.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
       </div>
 
@@ -114,7 +112,7 @@ export default function ControlPanel({
           className="w-full text-xs p-1"
           style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
         >
-          {EFFECTS.map((e) => <option key={e} value={e}>{e}</option>)}
+          {EFFECT_NAMES.map((e) => <option key={e} value={e}>{e}</option>)}
         </select>
       </div>
 

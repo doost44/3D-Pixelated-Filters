@@ -13,19 +13,15 @@ export function useExport(canvasRef: React.MutableRefObject<HTMLCanvasElement | 
     setIsExporting(true);
     setExportStatus('Exporting GIF...');
 
-    const GIF = (window as unknown as Record<string, unknown>)['GIF'] as (new (opts: unknown) => {
-      addFrame: (canvas: HTMLCanvasElement, opts: { delay: number; copy: boolean }) => void;
-      on: (event: string, cb: (blob: Blob) => void) => void;
-      render: () => void;
-    }) | undefined;
+    const GifConstructor = (typeof window !== 'undefined' ? window.GIF : undefined);
 
-    if (!GIF) {
+    if (!GifConstructor) {
       setExportStatus('gif.js not loaded');
       setIsExporting(false);
       return;
     }
 
-    const gif = new GIF({
+    const gif = new GifConstructor({
       workers: 2,
       quality: 10,
       width: canvas.width,

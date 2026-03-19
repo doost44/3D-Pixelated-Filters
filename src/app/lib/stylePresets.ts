@@ -70,3 +70,6 @@ export const DEFAULT_SETTINGS: StyleSettings = {
   palette: 'RGB',
   effect: 'Pixel',
 };
+
+export const PALETTE_NAMES = ['RGB', 'Techno', 'GameBoy', 'Neon', 'Vaporwave', 'Monochrome'] as const;
+export const EFFECT_NAMES = ['Pixel', 'Dither', 'CRT', 'Posterize', 'Mosaic', 'Glitch'] as const;

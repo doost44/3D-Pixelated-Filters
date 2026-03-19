@@ -1,5 +1,9 @@
 import { type PaletteName, COLOR_PALETTES, findClosestColor } from './colorPalettes';
 
+function clamp(value: number): number {
+  return value < 0 ? 0 : value > 255 ? 255 : value;
+}
+
 export function applyPixelate(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -37,23 +41,23 @@ export function applyDither(imageData: ImageData, amount: number, paletteName: P
       const errB = (oldB - newB) * amount / 100;
       // Floyd-Steinberg
       if (x + 1 < w) {
-        data[i + 4] = Math.min(255, Math.max(0, data[i + 4] + errR * 7 / 16));
-        data[i + 5] = Math.min(255, Math.max(0, data[i + 5] + errG * 7 / 16));
-        data[i + 6] = Math.min(255, Math.max(0, data[i + 6] + errB * 7 / 16));
+        data[i + 4] = clamp(data[i + 4] + errR * 7 / 16);
+        data[i + 5] = clamp(data[i + 5] + errG * 7 / 16);
+        data[i + 6] = clamp(data[i + 6] + errB * 7 / 16);
       }
       if (y + 1 < h) {
         if (x > 0) {
-          data[i + (w - 1) * 4] = Math.min(255, Math.max(0, data[i + (w - 1) * 4] + errR * 3 / 16));
-          data[i + (w - 1) * 4 + 1] = Math.min(255, Math.max(0, data[i + (w - 1) * 4 + 1] + errG * 3 / 16));
-          data[i + (w - 1) * 4 + 2] = Math.min(255, Math.max(0, data[i + (w - 1) * 4 + 2] + errB * 3 / 16));
+          data[i + (w - 1) * 4] = clamp(data[i + (w - 1) * 4] + errR * 3 / 16);
+          data[i + (w - 1) * 4 + 1] = clamp(data[i + (w - 1) * 4 + 1] + errG * 3 / 16);
+          data[i + (w - 1) * 4 + 2] = clamp(data[i + (w - 1) * 4 + 2] + errB * 3 / 16);
         }
-        data[i + w * 4] = Math.min(255, Math.max(0, data[i + w * 4] + errR * 5 / 16));
-        data[i + w * 4 + 1] = Math.min(255, Math.max(0, data[i + w * 4 + 1] + errG * 5 / 16));
-        data[i + w * 4 + 2] = Math.min(255, Math.max(0, data[i + w * 4 + 2] + errB * 5 / 16));
+        data[i + w * 4] = clamp(data[i + w * 4] + errR * 5 / 16);
+        data[i + w * 4 + 1] = clamp(data[i + w * 4 + 1] + errG * 5 / 16);
+        data[i + w * 4 + 2] = clamp(data[i + w * 4 + 2] + errB * 5 / 16);
         if (x + 1 < w) {
-          data[i + (w + 1) * 4] = Math.min(255, Math.max(0, data[i + (w + 1) * 4] + errR * 1 / 16));
-          data[i + (w + 1) * 4 + 1] = Math.min(255, Math.max(0, data[i + (w + 1) * 4 + 1] + errG * 1 / 16));
-          data[i + (w + 1) * 4 + 2] = Math.min(255, Math.max(0, data[i + (w + 1) * 4 + 2] + errB * 1 / 16));
+          data[i + (w + 1) * 4] = clamp(data[i + (w + 1) * 4] + errR * 1 / 16);
+          data[i + (w + 1) * 4 + 1] = clamp(data[i + (w + 1) * 4 + 1] + errG * 1 / 16);
+          data[i + (w + 1) * 4 + 2] = clamp(data[i + (w + 1) * 4 + 2] + errB * 1 / 16);
         }
       }
     }
