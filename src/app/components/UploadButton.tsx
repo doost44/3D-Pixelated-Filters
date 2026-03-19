@@ -2,7 +2,7 @@
 import { useRef } from 'react';
 
 interface UploadButtonProps {
-  onUpload: (src: string, file: File) => void;
+  onUpload: (src: string) => void;
 }
 
 export default function UploadButton({ onUpload }: UploadButtonProps) {
@@ -12,7 +12,7 @@ export default function UploadButton({ onUpload }: UploadButtonProps) {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    onUpload(url, file);
+    onUpload(url);
   };
 
   return (

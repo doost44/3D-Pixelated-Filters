@@ -21,7 +21,7 @@ export default function Home() {
 
   const { exportGIF, exportWebM, exportPNGSequence, isExporting, exportStatus } = useExport(canvasRef);
 
-  const handleUpload = useCallback((src: string, _file: File) => {
+  const handleUpload = useCallback((src: string) => {
     loadVideo(src);
     setVideoLoaded(true);
   }, [loadVideo]);
@@ -108,9 +108,9 @@ export default function Home() {
       />
 
       <ExportPanel
-        onExportGIF={() => exportGIF(state.loopOut - state.loopIn)}
+        onExportGIF={() => exportGIF(videoRef, state.loopIn, state.loopOut)}
         onExportWebM={() => exportWebM(state.loopOut - state.loopIn)}
-        onExportPNG={() => exportPNGSequence(videoRef)}
+        onExportPNG={() => exportPNGSequence(videoRef, state.loopIn, state.loopOut)}
         isExporting={isExporting}
         exportStatus={exportStatus}
         videoLoaded={videoLoaded}
