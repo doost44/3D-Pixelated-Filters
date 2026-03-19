@@ -9,7 +9,7 @@ const nextConfig = {
     unoptimized: true,
   },
   basePath,
-  assetPrefix: basePath ? `${basePath}/` : undefined,
+  assetPrefix: basePath || undefined,
 };
 
 module.exports = nextConfig;
