@@ -5,6 +5,8 @@ import CanvasPreview from "./components/CanvasPreview";
 import ControlPanel from "./components/ControlPanel";
 import Timeline from "./components/Timeline";
 import ExportPanel from "./components/ExportPanel";
+import CanvasSizePanel from "./components/CanvasSizePanel";
+import type { CanvasSize } from "./components/CanvasSizePanel";
 import { useVideoPlayer } from "./components/hooks/useVideoPlayer";
 import { usePixelRenderer } from "./components/hooks/usePixelRenderer";
 import { useExport } from "./components/hooks/useExport";
@@ -18,6 +20,7 @@ import type { StyleSettings } from "./lib/stylePresets";
 export default function Home() {
   const [settings, setSettings] = useState<StyleSettings>(DEFAULT_SETTINGS);
   const [mediaLoaded, setMediaLoaded] = useState(false);
+  const [canvasSize, setCanvasSize] = useState<CanvasSize>({ width: 600, height: 600 });
 
   const {
     videoRef,
@@ -112,7 +115,12 @@ export default function Home() {
       </div>
 
       <div className="flex-1 relative flex items-center justify-center">
-        <CanvasPreview canvasRef={canvasRef} videoLoaded={mediaLoaded} />
+        <CanvasPreview
+          canvasRef={canvasRef}
+          videoLoaded={mediaLoaded}
+          canvasWidth={canvasSize.width}
+          canvasHeight={canvasSize.height}
+        />
       </div>
 
       <UploadButton onUpload={handleUpload} />
@@ -139,29 +147,33 @@ export default function Home() {
         />
       )}
 
-      <ExportPanel
-        onExportGIF={() =>
-          state.mediaType === "video" &&
-          exportGIF(videoRef, state.loopIn, state.loopOut)
-        }
-        onExportWebM={() =>
-          state.mediaType === "video" &&
-          exportWebM(state.loopOut - state.loopIn)
-        }
-        onExportPNG={() => {
-          if (state.mediaType === "video") {
-            exportPNGSequence(videoRef, state.loopIn, state.loopOut);
-            return;
+      <div className="absolute bottom-24 right-4 z-20 flex flex-col gap-2">
+        <CanvasSizePanel size={canvasSize} onChange={setCanvasSize} />
+
+        <ExportPanel
+          onExportGIF={() =>
+            state.mediaType === "video" &&
+            exportGIF(videoRef, state.loopIn, state.loopOut)
           }
-          if (state.mediaType === "image") {
-            exportPNGStill();
+          onExportWebM={() =>
+            state.mediaType === "video" &&
+            exportWebM(state.loopOut - state.loopIn)
           }
-        }}
-        isExporting={isExporting}
-        exportStatus={exportStatus}
-        mediaLoaded={mediaLoaded}
-        mediaType={state.mediaType}
-      />
+          onExportPNG={() => {
+            if (state.mediaType === "video") {
+              exportPNGSequence(videoRef, state.loopIn, state.loopOut);
+              return;
+            }
+            if (state.mediaType === "image") {
+              exportPNGStill();
+            }
+          }}
+          isExporting={isExporting}
+          exportStatus={exportStatus}
+          mediaLoaded={mediaLoaded}
+          mediaType={state.mediaType}
+        />
+      </div>
     </main>
   );
 }

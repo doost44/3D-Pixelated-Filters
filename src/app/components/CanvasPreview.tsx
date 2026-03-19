@@ -4,11 +4,15 @@ import { useEffect } from "react";
 interface CanvasPreviewProps {
   canvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
   videoLoaded: boolean;
+  canvasWidth?: number;
+  canvasHeight?: number;
 }
 
 export default function CanvasPreview({
   canvasRef,
   videoLoaded,
+  canvasWidth = 600,
+  canvasHeight = 600,
 }: CanvasPreviewProps) {
   useEffect(() => {
     // Canvas is managed by usePixelRenderer hook
@@ -39,8 +43,8 @@ export default function CanvasPreview({
         ref={(el) => {
           if (el) canvasRef.current = el;
         }}
-        width={600}
-        height={600}
+        width={canvasWidth}
+        height={canvasHeight}
         style={{
           imageRendering: "pixelated",
           border: "1px solid #00ff8833",

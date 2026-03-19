@@ -36,7 +36,7 @@ export default function ExportPanel({
 
   return (
     <div
-      className="absolute bottom-24 right-4 z-20 panel-bg rounded p-3"
+      className="panel-bg rounded p-3"
       style={{
         border: "1px solid #00ff8844",
         boxShadow: "0 0 20px #00ff8811",
