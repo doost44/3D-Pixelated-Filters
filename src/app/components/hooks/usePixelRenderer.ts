@@ -10,8 +10,8 @@ import {
 export function usePixelRenderer(
   videoRef: React.MutableRefObject<HTMLVideoElement | null>,
   settings: StyleSettings,
-  _isPlaying: boolean,
-  _loopBlend: boolean
+  _isPlaying?: boolean,
+  _loopBlend?: boolean
 ) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);

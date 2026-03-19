@@ -21,7 +21,7 @@ export default function Home() {
 
   const { exportGIF, exportWebM, exportPNGSequence, isExporting, exportStatus } = useExport(canvasRef);
 
-  const handleUpload = useCallback((src: string) => {
+  const handleUpload = useCallback((src: string, _file: File) => {
     loadVideo(src);
     setVideoLoaded(true);
   }, [loadVideo]);
