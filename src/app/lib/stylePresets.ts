@@ -16,6 +16,21 @@ export interface StyleSettings {
   loopBlend: boolean;
   palette: string;
   effect: string;
+  // 3D Block Effect settings
+  blockText?: string;
+  blockFont?: string;
+  blockMaterial?: string;
+  blockFrontColor?: string;
+  blockSideColor?: string;
+  blockOutlineThickness?: number;
+  blockExtrusionDepth?: number;
+  blockExtrusionAngle?: number;
+  blockPerspective?: number;
+  blockCrackAmount?: number;
+  blockShadowStrength?: number;
+  blockLightAngle?: number;
+  blockHighlightAmount?: number;
+  blockTextureScale?: number;
 }
 
 export const STYLE_PRESETS: Record<PresetName, Partial<StyleSettings>> = {
@@ -69,7 +84,24 @@ export const DEFAULT_SETTINGS: StyleSettings = {
   loopBlend: false,
   palette: 'RGB',
   effect: 'Pixel',
+  // 3D Block Effect defaults
+  blockText: 'PIXEL',
+  blockFont: 'Arial Black',
+  blockMaterial: 'Stone',
+  blockFrontColor: '#8b7355',
+  blockSideColor: '#5c4a3a',
+  blockOutlineThickness: 3,
+  blockExtrusionDepth: 20,
+  blockExtrusionAngle: 45,
+  blockPerspective: 15,
+  blockCrackAmount: 30,
+  blockShadowStrength: 50,
+  blockLightAngle: 135,
+  blockHighlightAmount: 40,
+  blockTextureScale: 100,
 };
 
 export const PALETTE_NAMES = ['RGB', 'Techno', 'GameBoy', 'Neon', 'Vaporwave', 'Monochrome'] as const;
-export const EFFECT_NAMES = ['Pixel', 'Dither', 'CRT', 'Posterize', 'Mosaic', 'Glitch'] as const;
+export const EFFECT_NAMES = ['Pixel', 'Dither', 'CRT', 'Posterize', 'Mosaic', 'Glitch', '3D Block'] as const;
+export const BLOCK_FONTS = ['Arial Black', 'Impact', 'Courier New', 'Georgia', 'Times New Roman', 'Comic Sans MS'] as const;
+export const BLOCK_MATERIALS = ['Stone', 'Metal', 'Wood', 'Ice', 'Lava', 'Crystal'] as const;
