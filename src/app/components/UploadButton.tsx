@@ -1,8 +1,8 @@
-'use client';
-import { useRef } from 'react';
+"use client";
+import { useRef } from "react";
 
 interface UploadButtonProps {
-  onUpload: (src: string) => void;
+  onUpload: (src: string, type: string) => void;
 }
 
 export default function UploadButton({ onUpload }: UploadButtonProps) {
@@ -12,7 +12,7 @@ export default function UploadButton({ onUpload }: UploadButtonProps) {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    onUpload(url);
+    onUpload(url, file.type);
   };
 
   return (
@@ -20,14 +20,18 @@ export default function UploadButton({ onUpload }: UploadButtonProps) {
       <button
         onClick={() => inputRef.current?.click()}
         className="px-4 py-2 neon-border neon-text font-mono text-sm hover:bg-green-900/30 transition-colors"
-        style={{ border: '1px solid #00ff88', color: '#00ff88', boxShadow: '0 0 8px #00ff8844' }}
+        style={{
+          border: "1px solid #00ff88",
+          color: "#00ff88",
+          boxShadow: "0 0 8px #00ff8844",
+        }}
       >
-        ▲ UPLOAD VIDEO
+        ▲ UPLOAD MEDIA
       </button>
       <input
         ref={inputRef}
         type="file"
-        accept="video/mp4,video/mov,video/webm,video/quicktime,image/gif"
+        accept="video/*,image/*"
         onChange={handleChange}
         className="hidden"
       />

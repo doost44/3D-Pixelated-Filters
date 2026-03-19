@@ -1,5 +1,5 @@
-'use client';
-import { useRef, useState, useCallback, useEffect } from 'react';
+"use client";
+import { useRef, useState, useCallback, useEffect } from "react";
 
 export interface VideoPlayerState {
   duration: number;
@@ -8,10 +8,12 @@ export interface VideoPlayerState {
   loopIn: number;
   loopOut: number;
   videoSrc: string | null;
+  mediaType: "none" | "video" | "image";
 }
 
 export function useVideoPlayer() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const sourceRef = useRef<HTMLVideoElement | HTMLImageElement | null>(null);
   const [state, setState] = useState<VideoPlayerState>({
     duration: 0,
     currentTime: 0,
@@ -19,6 +21,7 @@ export function useVideoPlayer() {
     loopIn: 0,
     loopOut: 1,
     videoSrc: null,
+    mediaType: "none",
   });
   const animRef = useRef<number>(0);
   const loopInRef = useRef(0);
@@ -40,30 +43,62 @@ export function useVideoPlayer() {
     animRef.current = requestAnimationFrame(tick);
   }, []);
 
-  const loadVideo = useCallback((src: string) => {
+  const loadVideo = useCallback((src: string, type: string = "video/mp4") => {
     const video = videoRef.current;
     if (!video) return;
+
+    cancelAnimationFrame(animRef.current);
+    video.pause();
+
+    if (type.startsWith("image/")) {
+      const image = new Image();
+      image.crossOrigin = "anonymous";
+      image.onload = () => {
+        sourceRef.current = image;
+        setState((prev) => ({
+          ...prev,
+          duration: 1,
+          currentTime: 0,
+          isPlaying: false,
+          loopIn: 0,
+          loopOut: 1,
+          videoSrc: src,
+          mediaType: "image",
+        }));
+        loopInRef.current = 0;
+        loopOutRef.current = 1;
+      };
+      image.src = src;
+      return;
+    }
+
+    sourceRef.current = video;
     video.src = src;
     video.load();
     video.onloadedmetadata = () => {
       const dur = video.duration;
       setState((prev) => ({
         ...prev,
+        currentTime: 0,
+        isPlaying: false,
         duration: dur,
         loopIn: 0,
         loopOut: dur,
         videoSrc: src,
+        mediaType: "video",
       }));
+      loopInRef.current = 0;
       loopOutRef.current = dur;
       video.currentTime = 0;
     };
   }, []);
 
   const play = useCallback(() => {
+    if (state.mediaType !== "video") return;
     videoRef.current?.play();
     setState((prev) => ({ ...prev, isPlaying: true }));
     animRef.current = requestAnimationFrame(tick);
-  }, [tick]);
+  }, [state.mediaType, tick]);
 
   const pause = useCallback(() => {
     videoRef.current?.pause();
@@ -72,13 +107,24 @@ export function useVideoPlayer() {
   }, []);
 
   const togglePlay = useCallback(() => {
-    if (state.isPlaying) pause(); else play();
+    if (state.isPlaying) pause();
+    else play();
   }, [state.isPlaying, play, pause]);
 
-  const seekTo = useCallback((time: number) => {
-    if (videoRef.current) videoRef.current.currentTime = time;
-    setState((prev) => ({ ...prev, currentTime: time }));
-  }, []);
+  const seekTo = useCallback(
+    (time: number) => {
+      if (state.mediaType === "video" && videoRef.current) {
+        videoRef.current.currentTime = time;
+        setState((prev) => ({ ...prev, currentTime: time }));
+        return;
+      }
+
+      if (state.mediaType === "image") {
+        setState((prev) => ({ ...prev, currentTime: 0 }));
+      }
+    },
+    [state.mediaType],
+  );
 
   const setLoopIn = useCallback((t: number) => {
     setState((prev) => ({ ...prev, loopIn: t }));
@@ -89,16 +135,28 @@ export function useVideoPlayer() {
   }, []);
 
   useEffect(() => {
-    const video = document.createElement('video');
+    const video = document.createElement("video");
     video.muted = true;
     video.loop = false;
     video.playsInline = true;
-    video.crossOrigin = 'anonymous';
+    video.crossOrigin = "anonymous";
     videoRef.current = video;
+    sourceRef.current = video;
     return () => {
       cancelAnimationFrame(animRef.current);
     };
   }, []);
 
-  return { videoRef, state, loadVideo, play, pause, togglePlay, seekTo, setLoopIn, setLoopOut };
+  return {
+    videoRef,
+    sourceRef,
+    state,
+    loadVideo,
+    play,
+    pause,
+    togglePlay,
+    seekTo,
+    setLoopIn,
+    setLoopOut,
+  };
 }

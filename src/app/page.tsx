@@ -1,34 +1,60 @@
-'use client';
-import { useState, useCallback } from 'react';
-import UploadButton from './components/UploadButton';
-import CanvasPreview from './components/CanvasPreview';
-import ControlPanel from './components/ControlPanel';
-import Timeline from './components/Timeline';
-import ExportPanel from './components/ExportPanel';
-import { useVideoPlayer } from './components/hooks/useVideoPlayer';
-import { usePixelRenderer } from './components/hooks/usePixelRenderer';
-import { useExport } from './components/hooks/useExport';
-import { DEFAULT_SETTINGS, PALETTE_NAMES, EFFECT_NAMES } from './lib/stylePresets';
-import type { StyleSettings } from './lib/stylePresets';
+"use client";
+import { useState, useCallback } from "react";
+import UploadButton from "./components/UploadButton";
+import CanvasPreview from "./components/CanvasPreview";
+import ControlPanel from "./components/ControlPanel";
+import Timeline from "./components/Timeline";
+import ExportPanel from "./components/ExportPanel";
+import { useVideoPlayer } from "./components/hooks/useVideoPlayer";
+import { usePixelRenderer } from "./components/hooks/usePixelRenderer";
+import { useExport } from "./components/hooks/useExport";
+import {
+  DEFAULT_SETTINGS,
+  PALETTE_NAMES,
+  EFFECT_NAMES,
+} from "./lib/stylePresets";
+import type { StyleSettings } from "./lib/stylePresets";
 
 export default function Home() {
   const [settings, setSettings] = useState<StyleSettings>(DEFAULT_SETTINGS);
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [mediaLoaded, setMediaLoaded] = useState(false);
 
-  const { videoRef, state, loadVideo, togglePlay, seekTo, setLoopIn, setLoopOut } = useVideoPlayer();
+  const {
+    videoRef,
+    sourceRef,
+    state,
+    loadVideo,
+    togglePlay,
+    seekTo,
+    setLoopIn,
+    setLoopOut,
+  } = useVideoPlayer();
 
-  const canvasRef = usePixelRenderer(videoRef, settings);
+  const canvasRef = usePixelRenderer(sourceRef, settings);
 
-  const { exportGIF, exportWebM, exportPNGSequence, isExporting, exportStatus } = useExport(canvasRef);
+  const {
+    exportGIF,
+    exportWebM,
+    exportPNGSequence,
+    exportPNGStill,
+    isExporting,
+    exportStatus,
+  } = useExport(canvasRef);
 
-  const handleUpload = useCallback((src: string) => {
-    loadVideo(src);
-    setVideoLoaded(true);
-  }, [loadVideo]);
+  const handleUpload = useCallback(
+    (src: string, type: string) => {
+      loadVideo(src, type);
+      setMediaLoaded(true);
+    },
+    [loadVideo],
+  );
 
-  const handleSettingsChange = useCallback((partial: Partial<StyleSettings>) => {
-    setSettings((prev) => ({ ...prev, ...partial }));
-  }, []);
+  const handleSettingsChange = useCallback(
+    (partial: Partial<StyleSettings>) => {
+      setSettings((prev) => ({ ...prev, ...partial }));
+    },
+    [],
+  );
 
   const handleRandomize = useCallback(() => {
     setSettings((prev) => ({
@@ -56,7 +82,7 @@ export default function Home() {
   return (
     <main
       className="w-screen h-screen overflow-hidden relative flex flex-col"
-      style={{ background: '#000', fontFamily: 'monospace' }}
+      style={{ background: "#000", fontFamily: "monospace" }}
     >
       <div
         className="absolute inset-0 pointer-events-none"
@@ -65,24 +91,28 @@ export default function Home() {
             linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
             linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px)
           `,
-          backgroundSize: '40px 40px',
+          backgroundSize: "40px 40px",
         }}
       />
 
       <div
         className="relative z-10 px-4 py-2 flex items-center justify-between"
-        style={{ borderBottom: '1px solid #00ff8822' }}
+        style={{ borderBottom: "1px solid #00ff8822" }}
       >
-        <div className="text-xs tracking-widest" style={{ color: '#00ff8844' }}>
+        <div className="text-xs tracking-widest" style={{ color: "#00ff8844" }}>
           PIXEL LOOP STUDIO v0.1
         </div>
-        <div className="text-xs" style={{ color: '#00ff8833' }}>
-          {videoLoaded ? `◉ ${state.currentTime.toFixed(2)}s / ${state.duration.toFixed(2)}s` : '◌ NO INPUT'}
+        <div className="text-xs" style={{ color: "#00ff8833" }}>
+          {mediaLoaded
+            ? state.mediaType === "video"
+              ? `◉ ${state.currentTime.toFixed(2)}s / ${state.duration.toFixed(2)}s`
+              : "◉ IMAGE LOADED"
+            : "◌ NO INPUT"}
         </div>
       </div>
 
       <div className="flex-1 relative flex items-center justify-center">
-        <CanvasPreview canvasRef={canvasRef} videoLoaded={videoLoaded} />
+        <CanvasPreview canvasRef={canvasRef} videoLoaded={mediaLoaded} />
       </div>
 
       <UploadButton onUpload={handleUpload} />
@@ -94,26 +124,43 @@ export default function Home() {
         onReset={handleReset}
         isPlaying={state.isPlaying}
         onTogglePlay={togglePlay}
-        videoLoaded={videoLoaded}
+        videoLoaded={mediaLoaded && state.mediaType === "video"}
       />
 
-      <Timeline
-        currentTime={state.currentTime}
-        duration={state.duration}
-        loopIn={state.loopIn}
-        loopOut={state.loopOut}
-        onSeek={seekTo}
-        onSetLoopIn={setLoopIn}
-        onSetLoopOut={setLoopOut}
-      />
+      {state.mediaType === "video" && (
+        <Timeline
+          currentTime={state.currentTime}
+          duration={state.duration}
+          loopIn={state.loopIn}
+          loopOut={state.loopOut}
+          onSeek={seekTo}
+          onSetLoopIn={setLoopIn}
+          onSetLoopOut={setLoopOut}
+        />
+      )}
 
       <ExportPanel
-        onExportGIF={() => exportGIF(videoRef, state.loopIn, state.loopOut)}
-        onExportWebM={() => exportWebM(state.loopOut - state.loopIn)}
-        onExportPNG={() => exportPNGSequence(videoRef, state.loopIn, state.loopOut)}
+        onExportGIF={() =>
+          state.mediaType === "video" &&
+          exportGIF(videoRef, state.loopIn, state.loopOut)
+        }
+        onExportWebM={() =>
+          state.mediaType === "video" &&
+          exportWebM(state.loopOut - state.loopIn)
+        }
+        onExportPNG={() => {
+          if (state.mediaType === "video") {
+            exportPNGSequence(videoRef, state.loopIn, state.loopOut);
+            return;
+          }
+          if (state.mediaType === "image") {
+            exportPNGStill();
+          }
+        }}
         isExporting={isExporting}
         exportStatus={exportStatus}
-        videoLoaded={videoLoaded}
+        mediaLoaded={mediaLoaded}
+        mediaType={state.mediaType}
       />
     </main>
   );
