@@ -169,6 +169,79 @@ export function applyEdgeGlow(ctx: CanvasRenderingContext2D, width: number, heig
   ctx.restore();
 }
 
+// Bayer 4x4 ordered dithering matrix for cross-hatch look
+const BAYER4 = [
+  [ 0,  8,  2, 10],
+  [12,  4, 14,  6],
+  [ 3, 11,  1,  9],
+  [15,  7, 13,  5],
+];
+
+export function applyDarkFantasy(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  pixelSize: number,
+): void {
+  // 1) Pixelate
+  applyPixelate(ctx, width, height, Math.max(3, pixelSize));
+
+  // 2) Darken + desaturate + push toward purple/brown via pixel manipulation
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      let r = data[i], g = data[i + 1], b = data[i + 2];
+
+      // Desaturate partially
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      r = r * 0.6 + lum * 0.4;
+      g = g * 0.5 + lum * 0.5;
+      b = b * 0.6 + lum * 0.4;
+
+      // Push shadows toward purple, midtones toward brown
+      if (lum < 80) {
+        r = r * 0.7 + 30;
+        b = b * 0.7 + 40;
+        g = g * 0.6;
+      } else if (lum < 160) {
+        r = r * 0.85 + 15;
+        g = g * 0.8 + 10;
+        b = b * 0.75;
+      }
+
+      // Ordered dithering: quantize with Bayer threshold
+      const threshold = (BAYER4[y % 4][x % 4] / 16 - 0.5) * 48;
+      r = clamp(Math.round(r + threshold));
+      g = clamp(Math.round(g + threshold));
+      b = clamp(Math.round(b + threshold));
+
+      // Posterize to fewer levels for that painted pixel-art feel
+      const levels = 8;
+      const step = 255 / (levels - 1);
+      r = Math.round(Math.round(r / step) * step);
+      g = Math.round(Math.round(g / step) * step);
+      b = Math.round(Math.round(b / step) * step);
+
+      data[i] = r; data[i + 1] = g; data[i + 2] = b;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  // 3) Heavy vignette
+  const gradient = ctx.createRadialGradient(
+    width / 2, height / 2, height * 0.2,
+    width / 2, height / 2, height * 0.75,
+  );
+  gradient.addColorStop(0, 'rgba(0,0,0,0)');
+  gradient.addColorStop(0.6, 'rgba(0,0,0,0.3)');
+  gradient.addColorStop(1, 'rgba(0,0,0,0.75)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+}
+
 export function applyColorPalette(imageData: ImageData, paletteName: PaletteName): ImageData {
   const palette = COLOR_PALETTES[paletteName];
   if (palette.length === 0) return imageData;

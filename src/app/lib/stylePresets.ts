@@ -71,5 +71,5 @@ export const DEFAULT_SETTINGS: StyleSettings = {
   effect: 'Pixel',
 };
 
-export const PALETTE_NAMES = ['RGB', 'Techno', 'GameBoy', 'Neon', 'Vaporwave', 'Monochrome'] as const;
-export const EFFECT_NAMES = ['Pixel', 'Dither', 'CRT', 'Posterize', 'Mosaic', 'Glitch'] as const;
+export const PALETTE_NAMES = ['RGB', 'Techno', 'GameBoy', 'Neon', 'Vaporwave', 'Monochrome', 'DarkFantasy'] as const;
+export const EFFECT_NAMES = ['Pixel', 'Dither', 'CRT', 'Posterize', 'Mosaic', 'Glitch', 'DarkFantasy'] as const;

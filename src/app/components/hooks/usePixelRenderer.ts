@@ -9,6 +9,7 @@ import {
   applyPosterize,
   applyMosaic,
   applyGlitch,
+  applyDarkFantasy,
   applyScanlines,
   applyEdgeGlow,
   applyColorPalette,
@@ -116,6 +117,9 @@ export function usePixelRenderer(
     }
     if (effect === "Glitch") {
       applyGlitch(ctx, w, h, settings.pixelSize * 3);
+    }
+    if (effect === "DarkFantasy") {
+      applyDarkFantasy(ctx, w, h, settings.pixelSize);
     }
 
     if (settings.palette !== "RGB") {

@@ -1,5 +1,5 @@
 export type RGB = [number, number, number];
-export type PaletteName = 'Techno' | 'GameBoy' | 'Neon' | 'Vaporwave' | 'Monochrome' | 'RGB';
+export type PaletteName = 'Techno' | 'GameBoy' | 'Neon' | 'Vaporwave' | 'Monochrome' | 'DarkFantasy' | 'RGB';
 
 export const COLOR_PALETTES: Record<PaletteName, RGB[]> = {
   Techno: [
@@ -28,6 +28,14 @@ export const COLOR_PALETTES: Record<PaletteName, RGB[]> = {
     [73, 73, 73], [91, 91, 91], [109, 109, 109], [128, 128, 128],
     [146, 146, 146], [164, 164, 164], [182, 182, 182], [200, 200, 200],
     [218, 218, 218], [236, 236, 236], [245, 245, 245], [255, 255, 255],
+  ],
+  DarkFantasy: [
+    [10, 8, 15], [25, 18, 30], [45, 30, 50], [70, 45, 75],       // deep purples/blacks
+    [100, 60, 100], [140, 80, 140], [180, 120, 180], [200, 160, 220], // lighter purples
+    [50, 35, 20], [80, 55, 30], [120, 80, 40], [160, 110, 60],     // browns
+    [30, 50, 30], [50, 80, 45], [80, 110, 60], [110, 140, 80],     // mossy greens
+    [60, 40, 40], [130, 70, 50], [180, 100, 60], [200, 140, 80],   // warm rust/amber
+    [150, 140, 100], [200, 190, 140], [230, 220, 180], [255, 240, 200], // stone/highlight
   ],
   RGB: [],
 };
