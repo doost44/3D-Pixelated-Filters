@@ -10,6 +10,7 @@ import {
   applyMosaic,
   applyGlitch,
   applyDarkFantasy,
+  applyVoxelArt,
   applyScanlines,
   applyEdgeGlow,
   applyColorPalette,
@@ -120,6 +121,9 @@ export function usePixelRenderer(
     }
     if (effect === "DarkFantasy") {
       applyDarkFantasy(ctx, w, h, settings.pixelSize);
+    }
+    if (effect === "VoxelArt") {
+      applyVoxelArt(ctx, w, h, settings.pixelSize);
     }
 
     if (settings.palette !== "RGB") {

@@ -242,6 +242,95 @@ export function applyDarkFantasy(
   ctx.fillRect(0, 0, width, height);
 }
 
+export function applyVoxelArt(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  pixelSize: number,
+): void {
+  // 1) Chunky pixelation — slightly larger than input for bold voxel blocks
+  const blockSize = Math.max(4, Math.round(pixelSize * 1.5));
+  applyPixelate(ctx, width, height, blockSize);
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  // 2) Per-pixel: atmospheric depth, warm/cool split, 3D block shading
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      let r = data[i], g = data[i + 1], b = data[i + 2];
+
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+      // Boost contrast: push darks darker, brights brighter
+      r = clamp(((r - 128) * 1.4) + 128);
+      g = clamp(((g - 128) * 1.4) + 128);
+      b = clamp(((b - 128) * 1.4) + 128);
+
+      // Warm/cool color split based on luminance
+      if (lum < 60) {
+        // Deep shadows → cool purple/blue
+        r = r * 0.5 + 15;
+        g = g * 0.4;
+        b = b * 0.6 + 30;
+      } else if (lum < 120) {
+        // Midtones → slightly desaturated, moody
+        r = r * 0.8 + 10;
+        g = g * 0.75 + 5;
+        b = b * 0.7 + 15;
+      } else if (lum > 200) {
+        // Bright areas → warm glow (push toward amber/orange)
+        r = clamp(r * 1.1 + 20);
+        g = g * 0.95 + 10;
+        b = b * 0.7;
+      }
+
+      // 3D block edge highlight: simulate light hitting block edges
+      const bx = x % blockSize;
+      const by = y % blockSize;
+      if (bx === 0 || by === 0) {
+        // Top/left edge — lighter (light source top-left)
+        r = clamp(r + 18);
+        g = clamp(g + 15);
+        b = clamp(b + 12);
+      } else if (bx === blockSize - 1 || by === blockSize - 1) {
+        // Bottom/right edge — darker
+        r = clamp(r - 20);
+        g = clamp(g - 20);
+        b = clamp(b - 18);
+      }
+
+      // Ordered dithering for textured look
+      const threshold = (BAYER4[y % 4][x % 4] / 16 - 0.5) * 32;
+      r = clamp(Math.round(r + threshold));
+      g = clamp(Math.round(g + threshold));
+      b = clamp(Math.round(b + threshold));
+
+      // Posterize to limited levels for pixel art feel
+      const levels = 10;
+      const step = 255 / (levels - 1);
+      r = Math.round(Math.round(r / step) * step);
+      g = Math.round(Math.round(g / step) * step);
+      b = Math.round(Math.round(b / step) * step);
+
+      data[i] = r; data[i + 1] = g; data[i + 2] = b;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  // 3) Atmospheric vignette — heavier than standard, with slight warm tint
+  const gradient = ctx.createRadialGradient(
+    width / 2, height / 2, height * 0.25,
+    width / 2, height / 2, height * 0.7,
+  );
+  gradient.addColorStop(0, 'rgba(0,0,0,0)');
+  gradient.addColorStop(0.5, 'rgba(5,2,10,0.25)');
+  gradient.addColorStop(1, 'rgba(8,4,16,0.7)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+}
+
 export function applyColorPalette(imageData: ImageData, paletteName: PaletteName): ImageData {
   const palette = COLOR_PALETTES[paletteName];
   if (palette.length === 0) return imageData;

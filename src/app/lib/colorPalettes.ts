@@ -1,5 +1,5 @@
 export type RGB = [number, number, number];
-export type PaletteName = 'Techno' | 'GameBoy' | 'Neon' | 'Vaporwave' | 'Monochrome' | 'DarkFantasy' | 'RGB';
+export type PaletteName = 'Techno' | 'GameBoy' | 'Neon' | 'Vaporwave' | 'Monochrome' | 'DarkFantasy' | 'VoxelArt' | 'RGB';
 
 export const COLOR_PALETTES: Record<PaletteName, RGB[]> = {
   Techno: [
@@ -36,6 +36,17 @@ export const COLOR_PALETTES: Record<PaletteName, RGB[]> = {
     [30, 50, 30], [50, 80, 45], [80, 110, 60], [110, 140, 80],     // mossy greens
     [60, 40, 40], [130, 70, 50], [180, 100, 60], [200, 140, 80],   // warm rust/amber
     [150, 140, 100], [200, 190, 140], [230, 220, 180], [255, 240, 200], // stone/highlight
+  ],
+  VoxelArt: [
+    [8, 6, 12], [18, 12, 24], [30, 20, 38], [48, 32, 55],       // deep dark purples
+    [65, 45, 70], [85, 55, 95], [120, 80, 130],                   // mid purples
+    [40, 25, 15], [70, 40, 20], [110, 65, 30], [155, 95, 45],     // deep browns/amber
+    [200, 130, 50], [230, 170, 60], [255, 200, 80], [255, 230, 140], // warm glow highlights
+    [255, 120, 40], [255, 80, 20], [200, 50, 15],                 // lava/fire oranges
+    [20, 35, 20], [35, 55, 30], [55, 80, 45], [80, 110, 60],     // mossy greens
+    [15, 20, 40], [25, 35, 65], [40, 55, 95], [70, 90, 140],     // cool blue shadows
+    [140, 130, 110], [180, 170, 145], [210, 200, 175], [240, 235, 215], // stone/highlight
+    [0, 0, 0], [12, 10, 18],                                       // pure darks
   ],
   RGB: [],
 };
