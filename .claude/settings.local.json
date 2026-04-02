@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(npx next:*)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 12408 //F)",
+      "Bash(SET NODE_OPTIONS=--max-old-space-size=4096)",
+      "Bash(NODE_OPTIONS=--max-old-space-size=4096 npx next dev --port 3000)"
     ]
   }
 }

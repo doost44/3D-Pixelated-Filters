@@ -131,6 +131,7 @@ export function usePixelRenderer(
       const palettized = applyColorPalette(
         imageData,
         settings.palette as PaletteName,
+        settings.palette === "Custom" ? settings.customPalette : undefined,
       );
       ctx.putImageData(palettized, 0, 0);
     }

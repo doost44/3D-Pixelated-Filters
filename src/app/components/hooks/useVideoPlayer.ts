@@ -8,7 +8,7 @@ export interface VideoPlayerState {
   loopIn: number;
   loopOut: number;
   videoSrc: string | null;
-  mediaType: "none" | "video" | "image";
+  mediaType: "none" | "video" | "image" | "gif";
 }
 
 export function useVideoPlayer() {
@@ -49,6 +49,29 @@ export function useVideoPlayer() {
 
     cancelAnimationFrame(animRef.current);
     video.pause();
+
+    // Handle GIF files — treat as animated image
+    if (type === "image/gif") {
+      const image = new Image();
+      image.crossOrigin = "anonymous";
+      image.onload = () => {
+        sourceRef.current = image;
+        setState((prev) => ({
+          ...prev,
+          duration: 1,
+          currentTime: 0,
+          isPlaying: true,
+          loopIn: 0,
+          loopOut: 1,
+          videoSrc: src,
+          mediaType: "gif",
+        }));
+        loopInRef.current = 0;
+        loopOutRef.current = 1;
+      };
+      image.src = src;
+      return;
+    }
 
     if (type.startsWith("image/")) {
       const image = new Image();

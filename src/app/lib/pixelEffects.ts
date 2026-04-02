@@ -331,8 +331,8 @@ export function applyVoxelArt(
   ctx.fillRect(0, 0, width, height);
 }
 
-export function applyColorPalette(imageData: ImageData, paletteName: PaletteName): ImageData {
-  const palette = COLOR_PALETTES[paletteName];
+export function applyColorPalette(imageData: ImageData, paletteName: PaletteName, customColors?: [number, number, number][]): ImageData {
+  const palette = paletteName === 'Custom' ? (customColors || []) : COLOR_PALETTES[paletteName];
   if (palette.length === 0) return imageData;
   const data = new Uint8ClampedArray(imageData.data);
   for (let i = 0; i < data.length; i += 4) {

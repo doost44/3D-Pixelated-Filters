@@ -16,6 +16,7 @@ export interface StyleSettings {
   loopBlend: boolean;
   palette: string;
   effect: string;
+  customPalette: [number, number, number][];
 }
 
 export const STYLE_PRESETS: Record<PresetName, Partial<StyleSettings>> = {
@@ -69,7 +70,8 @@ export const DEFAULT_SETTINGS: StyleSettings = {
   loopBlend: false,
   palette: 'RGB',
   effect: 'Pixel',
+  customPalette: [[255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 0], [255, 0, 255], [0, 255, 255], [0, 0, 0], [255, 255, 255]],
 };
 
-export const PALETTE_NAMES = ['RGB', 'Techno', 'GameBoy', 'Neon', 'Vaporwave', 'Monochrome', 'DarkFantasy', 'VoxelArt'] as const;
+export const PALETTE_NAMES = ['RGB', 'Techno', 'GameBoy', 'Neon', 'Vaporwave', 'Monochrome', 'DarkFantasy', 'VoxelArt', 'Retro', 'Pastel', 'Sunset', 'Ocean', 'Cyberpunk', 'Sepia', 'Custom'] as const;
 export const EFFECT_NAMES = ['Pixel', 'Dither', 'CRT', 'Posterize', 'Mosaic', 'Glitch', 'DarkFantasy', 'VoxelArt'] as const;

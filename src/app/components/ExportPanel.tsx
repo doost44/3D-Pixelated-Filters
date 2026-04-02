@@ -7,7 +7,8 @@ interface ExportPanelProps {
   isExporting: boolean;
   exportStatus: string;
   mediaLoaded: boolean;
-  mediaType: "none" | "video" | "image";
+  mediaType: "none" | "video" | "image" | "gif";
+  onExportGIFFromCanvas?: () => void;
 }
 
 export default function ExportPanel({
@@ -18,8 +19,10 @@ export default function ExportPanel({
   exportStatus,
   mediaLoaded,
   mediaType,
+  onExportGIFFromCanvas,
 }: ExportPanelProps) {
   const canExportVideo = mediaLoaded && mediaType === "video" && !isExporting;
+  const canExportGif = mediaLoaded && (mediaType === "video" || mediaType === "gif") && !isExporting;
   const canExportPNG = mediaLoaded && !isExporting;
 
   const btnStyle = (color: string, disabled: boolean) => ({
@@ -51,9 +54,9 @@ export default function ExportPanel({
       </div>
       <div className="flex flex-col gap-2">
         <button
-          onClick={onExportGIF}
-          disabled={!canExportVideo}
-          style={btnStyle("#ff00ff", !canExportVideo)}
+          onClick={mediaType === "gif" ? onExportGIFFromCanvas : onExportGIF}
+          disabled={!canExportGif}
+          style={btnStyle("#ff00ff", !canExportGif)}
         >
           ⬇ GIF
         </button>

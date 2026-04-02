@@ -1,6 +1,8 @@
 'use client';
+import { useState } from 'react';
 import type { StyleSettings, PresetName } from '../lib/stylePresets';
 import { STYLE_PRESETS, PALETTE_NAMES, EFFECT_NAMES } from '../lib/stylePresets';
+import { COLOR_PALETTES, type PaletteName } from '../lib/colorPalettes';
 
 interface ControlPanelProps {
   settings: StyleSettings;
@@ -51,6 +53,111 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
   );
 }
 
+function rgbToHex(r: number, g: number, b: number): string {
+  return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return [r, g, b];
+}
+
+function PaletteChooser({ selected, customPalette, onChange, onCustomChange }: {
+  selected: string;
+  customPalette: [number, number, number][];
+  onChange: (palette: string) => void;
+  onCustomChange: (colors: [number, number, number][]) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const getPreviewColors = (name: string): [number, number, number][] => {
+    if (name === 'Custom') return customPalette;
+    if (name === 'RGB') return [[255,0,0],[0,255,0],[0,0,255],[255,255,0]];
+    return (COLOR_PALETTES[name as PaletteName] || []).slice(0, 6);
+  };
+
+  return (
+    <div className="mb-2">
+      <div className="text-xs mb-1" style={{ color: '#666' }}>PALETTE</div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left text-xs p-1.5 flex items-center justify-between"
+        style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
+      >
+        <span>{selected}</span>
+        <div className="flex gap-0.5">
+          {getPreviewColors(selected).map((c, i) => (
+            <div key={i} className="w-3 h-3 rounded-sm" style={{ background: rgbToHex(c[0], c[1], c[2]) }} />
+          ))}
+        </div>
+      </button>
+      {expanded && (
+        <div className="mt-1 p-2 rounded" style={{ background: '#0a0a0a', border: '1px solid #00ff8833', maxHeight: '200px', overflowY: 'auto' }}>
+          {PALETTE_NAMES.map((name) => (
+            <button
+              key={name}
+              onClick={() => { onChange(name); if (name !== 'Custom') setExpanded(false); }}
+              className="w-full text-left text-xs p-1.5 mb-0.5 flex items-center justify-between rounded transition-colors"
+              style={{
+                background: selected === name ? '#00ff8818' : 'transparent',
+                border: selected === name ? '1px solid #00ff8844' : '1px solid transparent',
+                color: selected === name ? '#00ff88' : '#888',
+              }}
+            >
+              <span>{name}</span>
+              <div className="flex gap-0.5">
+                {getPreviewColors(name).map((c, i) => (
+                  <div key={i} className="w-3 h-3 rounded-sm" style={{ background: rgbToHex(c[0], c[1], c[2]) }} />
+                ))}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+      {selected === 'Custom' && (
+        <div className="mt-1 p-2 rounded" style={{ background: '#0a0a0a', border: '1px solid #ff00ff33' }}>
+          <div className="flex flex-wrap gap-1 mb-2">
+            {customPalette.map((c, i) => (
+              <div key={i} className="relative group">
+                <input
+                  type="color"
+                  value={rgbToHex(c[0], c[1], c[2])}
+                  onChange={(e) => {
+                    const newPalette = [...customPalette] as [number, number, number][];
+                    newPalette[i] = hexToRgb(e.target.value);
+                    onCustomChange(newPalette);
+                  }}
+                  className="w-6 h-6 cursor-pointer border-0 p-0 rounded-sm"
+                  style={{ background: 'none' }}
+                />
+                <button
+                  onClick={() => {
+                    const newPalette = customPalette.filter((_, j) => j !== i);
+                    onCustomChange(newPalette);
+                  }}
+                  className="absolute -top-1 -right-1 w-3 h-3 text-center leading-3 rounded-full hidden group-hover:block"
+                  style={{ background: '#ff0044', color: '#fff', fontSize: '8px' }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => onCustomChange([...customPalette, [128, 128, 128]])}
+            className="text-xs px-2 py-0.5"
+            style={{ border: '1px solid #ff00ff44', color: '#ff00ff', background: 'transparent' }}
+          >
+            + ADD COLOR
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ControlPanel({
   settings, onChange, onRandomize, onReset, isPlaying, onTogglePlay, videoLoaded,
 }: ControlPanelProps) {
@@ -92,17 +199,12 @@ export default function ControlPanel({
         </div>
       </div>
 
-      <div className="mb-2">
-        <div className="text-xs mb-1" style={{ color: '#666' }}>PALETTE</div>
-        <select
-          value={settings.palette}
-          onChange={(e) => onChange({ palette: e.target.value })}
-          className="w-full text-xs p-1"
-          style={{ background: '#111', color: '#00ff88', border: '1px solid #00ff8844' }}
-        >
-          {PALETTE_NAMES.map((p) => <option key={p} value={p}>{p}</option>)}
-        </select>
-      </div>
+      <PaletteChooser
+        selected={settings.palette}
+        customPalette={settings.customPalette}
+        onChange={(palette) => onChange({ palette })}
+        onCustomChange={(customPalette) => onChange({ customPalette })}
+      />
 
       <div className="mb-3">
         <div className="text-xs mb-1" style={{ color: '#666' }}>EFFECT</div>

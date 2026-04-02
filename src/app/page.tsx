@@ -34,6 +34,7 @@ export default function Home() {
 
   const {
     exportGIF,
+    exportGIFFromCanvas,
     exportWebM,
     exportPNGSequence,
     exportPNGStill,
@@ -144,6 +145,7 @@ export default function Home() {
           state.mediaType === "video" &&
           exportGIF(videoRef, state.loopIn, state.loopOut)
         }
+        onExportGIFFromCanvas={() => exportGIFFromCanvas()}
         onExportWebM={() =>
           state.mediaType === "video" &&
           exportWebM(state.loopOut - state.loopIn)
@@ -153,7 +155,7 @@ export default function Home() {
             exportPNGSequence(videoRef, state.loopIn, state.loopOut);
             return;
           }
-          if (state.mediaType === "image") {
+          if (state.mediaType === "image" || state.mediaType === "gif") {
             exportPNGStill();
           }
         }}

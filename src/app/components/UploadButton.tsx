@@ -31,7 +31,7 @@ export default function UploadButton({ onUpload }: UploadButtonProps) {
       <input
         ref={inputRef}
         type="file"
-        accept="video/*,image/*"
+        accept="video/*,image/*,.gif"
         onChange={handleChange}
         className="hidden"
       />

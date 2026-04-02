@@ -171,8 +171,57 @@ export function useExport(
     [canvasRef],
   );
 
+  const exportGIFFromCanvas = useCallback(
+    async (fps: number = 12, durationSec: number = 2) => {
+      if (typeof window === "undefined") return;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const GifConstructor = window.GIF;
+      if (!GifConstructor) {
+        setExportStatus("gif.js not loaded");
+        return;
+      }
+
+      setIsExporting(true);
+      setExportStatus("Capturing GIF frames…");
+
+      const frameCount = Math.max(1, Math.floor(durationSec * fps));
+      const delay = Math.round(1000 / fps);
+
+      const gif = new GifConstructor({
+        workers: 2,
+        quality: 10,
+        width: canvas.width,
+        height: canvas.height,
+        workerScript:
+          "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js",
+      });
+
+      for (let i = 0; i < frameCount; i++) {
+        await waitFrames();
+        gif.addFrame(canvas, { delay, copy: true });
+      }
+
+      gif.on("finished", (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "pixel-loop.gif";
+        a.click();
+        URL.revokeObjectURL(url);
+        setIsExporting(false);
+        setExportStatus("GIF exported!");
+      });
+
+      gif.render();
+    },
+    [canvasRef],
+  );
+
   return {
     exportGIF,
+    exportGIFFromCanvas,
     exportWebM,
     exportPNGSequence,
     exportPNGStill,
